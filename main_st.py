@@ -4,23 +4,15 @@ from io import BytesIO
 from datetime import datetime
 import psycopg2
 
-@st.cache_resource
-def init_connection():
-    return psycopg2.connect(**st.secrets["postgres"])
 
-conn = init_connection()
-
-# Perform query.
-# Uses st.cache_data to only rerun when the query changes or after 10 min.
-@st.cache_data(ttl=600)
-def run_query(query):
-    with conn.cursor() as cur:
-        cur.execute(query)
-        return cur.fetchall()
-
-rows = run_query("SELECT * from autorization;")
-
-st.write(rows)
+conn = psycopg2.connect(dbname='postgres', user='postgres', 
+                        password='1', host='localhost')
+cursor = conn.cursor()
+cursor.execute('SELECT * FROM autorization')
+records = cursor.fetchall()
+st.write(records)
+cursor.close()
+conn.close()
 
 
 
